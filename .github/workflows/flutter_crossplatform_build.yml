@@ -24,55 +24,6 @@ jobs:
           name: android-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
 
-  # ─── iOS (без подписи) ───────────────────────────────────
-  build-ios:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-      - run: flutter pub get
-      - run: flutter gen-l10n
-      - name: Set iOS deployment target to 14.0
-        run: |
-          # Заменяем существующую строку platform или добавляем, если её нет
-          if grep -q 'platform :ios' ios/Podfile; then
-            sed -i '' 's/platform :ios.*/platform :ios, "14.0"/' ios/Podfile
-          else
-            # Добавляем первой строкой
-            sed -i '' "1s/^/platform :ios, '14.0'\n/" ios/Podfile
-          fi
-      - run: flutter build ios --no-codesign --debug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ios-debug-app
-          path: build/ios/iphoneos/Runner.app
-
-  # ─── Linux Desktop ───────────────────────────────────────
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
-      - run: flutter pub get
-      - run: flutter gen-l10n
-      - name: Regenerate Linux platform files (fixes background color API)
-        run: flutter create --platforms=linux .
-      - run: flutter build linux --debug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: linux-debug-bundle
-          path: build/linux/x64/debug/bundle
-
   # ─── Web ─────────────────────────────────────────────────
   build-web:
     runs-on: ubuntu-latest
@@ -90,29 +41,3 @@ jobs:
           name: web-release
           path: build/web
 
-  # ─── Windows Desktop ─────────────────────────────────────
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-      - run: flutter pub get
-      - run: flutter gen-l10n
-
-      - name: Replace CMake generator for Visual Studio 2022
-        shell: powershell
-        run: |
-          Get-ChildItem -Path windows -Recurse -Filter CMakeLists.txt | ForEach-Object {
-              (Get-Content $_.FullName) -replace 'Visual Studio 16 2019', 'Visual Studio 17 2022' | Set-Content $_.FullName
-          }
-
-      - name: Build Windows (debug)
-        run: flutter build windows --debug
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windows-debug-exe
-          path: build/windows/x64/runner/Debug/*.exe
