@@ -101,8 +101,17 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter gen-l10n
-      - name: Build Windows with correct generator
-        run: flutter build windows --debug --cmake-generator="Visual Studio 17 2022"
+
+      - name: Replace CMake generator for Visual Studio 2022
+        shell: powershell
+        run: |
+          Get-ChildItem -Path windows -Recurse -Filter CMakeLists.txt | ForEach-Object {
+              (Get-Content $_.FullName) -replace 'Visual Studio 16 2019', 'Visual Studio 17 2022' | Set-Content $_.FullName
+          }
+
+      - name: Build Windows (debug)
+        run: flutter build windows --debug
+
       - uses: actions/upload-artifact@v4
         with:
           name: windows-debug-exe
