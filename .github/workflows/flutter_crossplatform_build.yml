@@ -35,6 +35,15 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter gen-l10n
+      - name: Set iOS deployment target to 14.0
+        run: |
+          # Заменяем существующую строку platform или добавляем, если её нет
+          if grep -q 'platform :ios' ios/Podfile; then
+            sed -i '' 's/platform :ios.*/platform :ios, "14.0"/' ios/Podfile
+          else
+            # Добавляем первой строкой
+            sed -i '' "1s/^/platform :ios, '14.0'\n/" ios/Podfile
+          fi
       - run: flutter build ios --no-codesign --debug
       - uses: actions/upload-artifact@v4
         with:
@@ -56,6 +65,8 @@ jobs:
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
       - run: flutter pub get
       - run: flutter gen-l10n
+      - name: Regenerate Linux platform files (fixes background color API)
+        run: flutter create --platforms=linux .
       - run: flutter build linux --debug
       - uses: actions/upload-artifact@v4
         with:
@@ -90,7 +101,10 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter gen-l10n
-      - run: flutter build windows --debug
+      - name: Build Windows (force Visual Studio 2022)
+        env:
+          CMAKE_GENERATOR: "Visual Studio 17 2022"
+        run: flutter build windows --debug
       - uses: actions/upload-artifact@v4
         with:
           name: windows-debug-exe
