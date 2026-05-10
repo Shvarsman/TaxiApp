@@ -102,13 +102,13 @@ jobs:
       - run: flutter pub get
       - run: flutter gen-l10n
 
-      - name: Regenerate Windows platform and fix CMake generator
+      - name: Fix CMake generator in Windows project
         shell: powershell
         run: |
-          Remove-Item -Recurse -Force windows -ErrorAction SilentlyContinue
-          flutter create --platforms=windows .
-          # Заменяем генератор на Visual Studio 2022 (17)
-          (Get-Content windows/flutter/CMakeLists.txt) -replace 'Visual Studio 16 2019', 'Visual Studio 17 2022' | Set-Content windows/flutter/CMakeLists.txt
+          # Замена во всех файлах CMakeLists.txt внутри папки windows
+          Get-ChildItem -Path windows -Recurse -Filter CMakeLists.txt | ForEach-Object {
+              (Get-Content $_.FullName) -replace 'Visual Studio 16 2019', 'Visual Studio 17 2022' | Set-Content $_.FullName
+          }
 
       - name: Build Windows (debug)
         run: flutter build windows --debug
