@@ -1,0 +1,40 @@
+name: taxi_app
+description: A taxi booking app with SQLite, maps, and animations.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.24.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_bloc: ^8.1.4
+  equatable: ^2.0.5
+  go_router: ^13.0.0
+  dio: ^5.4.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  shared_preferences: ^2.2.2
+  google_maps_flutter: ^2.5.0
+  flutter_local_notifications: ^17.0.0
+  fl_chart: ^0.66.0
+  animations: ^2.0.8
+  package_info_plus: ^8.0.0
+  connectivity_plus: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  bloc_test: ^9.1.4
+  mocktail: ^1.0.1
+  integration_test:
+    sdk: flutter
+
+flutter:
+  generate: true
+  uses-material-design: true
